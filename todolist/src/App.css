@@ -1,0 +1,67 @@
+/* General styling for the home container */
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffffff, #ffffff); /* Green gradient background */
+  font-family: 'Arial', sans-serif; /* Clean modern font */
+  color: #333; /* Slightly darker text for readability */
+}
+
+/* Style for the input and button container */
+.create_from {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between input and button */
+}
+
+/* Style for the input box */
+.create_from input {
+  width: 300px;
+  padding: 12px;
+  border: 2px solid #a6d48a; /* Light green border */
+  border-radius: 8px; /* Rounded corners */
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition effect */
+}
+
+.create_from input:focus {
+  border-color: #81c784; /* Darker green on focus */
+  box-shadow: 0 0 6px rgba(129, 199, 132, 0.5); /* Green glow on focus */
+}
+
+/* Style for the button */
+.create_from button {
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #075e0a; /* Green button */
+  border: none;
+  border-radius: 8px; /* Rounded corners */
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s ease; /* Hover and click effects */
+}
+
+.create_from button:hover {
+  background-color: #43a047; /* Slightly darker green on hover */
+  transform: scale(1.05); /* Slight zoom effect */
+}
+
+.create_from button:active {
+  background-color: #388e3c; /* Even darker green on click */
+  transform: scale(1); /* Reset zoom effect */
+}
+
+/* Add subtle shadow for elevated appearance */
+.create_from input, .create_from button {
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Additional styling for layout consistency */
+.create_from {
+  margin-top: 20px; /* Add some space from the top */
+}
