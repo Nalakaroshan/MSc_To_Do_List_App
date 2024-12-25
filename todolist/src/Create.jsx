@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-function Create() {
+function Create({ fetchTodos }) {  // Receive fetchTodos function as a prop
     const [task, setTask] = useState(""); // Initialize task state with an empty string
 
     const handleAdd = () => {
@@ -13,6 +13,7 @@ function Create() {
             .then(result => {
                 console.log(result);
                 alert("Task added successfully!"); // Notify user of successful addition
+                fetchTodos(); // Fetch the updated task list
                 setTask(""); // Clear the input field after successful submission
             })
             .catch(err => console.log(err));
