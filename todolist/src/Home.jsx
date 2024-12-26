@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 import Create from './Create';
 import axios from "axios";
 import "./App.css";
-import { BsCircleFill, BsFillCCircleFill, BsFillTrashFill, BsPencil } from 'react-icons/bs'; // Add pencil icon
+import { BsCircleFill, BsFillCCircleFill, BsFillTrashFill, BsPencil } from 'react-icons/bs';
 
 function Home() {
     const [todos, setTodos] = useState([]);
-    const [editTask, setEditTask] = useState(null); // State to track the task being edited
-    const [editedText, setEditedText] = useState(''); // State for the new task text
+    const [editTask, setEditTask] = useState(null);
+    const [editedText, setEditedText] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
 
-    // Fetch todos from the server
+    // Desplay all tasks
     const fetchTodos = () => {
         axios.get("http://localhost:3001/get")
             .then(result => setTodos(result.data))
@@ -20,6 +21,16 @@ function Home() {
         fetchTodos(); // Fetch the task list on component mount
     }, []);
 
+    // Handle search query change
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
+    // Filter tasks based on search query
+    const filteredTodos = todos.filter(todo =>
+        todo.task.toLowerCase().includes(searchQuery.toLowerCase()) // Case insensitive search
+    );
+
     // Toggle done/undone status of a task
     const handleToggleDone = (id, doneStatus) => {
         axios.put(`http://localhost:3001/update/${id}`, { done: !doneStatus })
@@ -27,7 +38,7 @@ function Home() {
                 const updatedTodos = todos.map(todo =>
                     todo._id === id ? { ...todo, done: !doneStatus } : todo
                 );
-                setTodos(updatedTodos); // Update state to re-render
+                setTodos(updatedTodos);
             })
             .catch(err => console.log(err));
     };
@@ -36,28 +47,28 @@ function Home() {
     const handleDelete = (id) => {
         axios.delete(`http://localhost:3001/delete/${id}`)
             .then(() => fetchTodos())
+             alert("Task delete successfully!") // Notify user of successful addition
             .catch(err => console.log(err));
     };
 
     // Handle editing a task
     const handleEditClick = (todo) => {
-        setEditTask(todo._id); // Set the task being edited
-        setEditedText(todo.task); // Set the current text of the task to be edited
+        setEditTask(todo._id);
+        setEditedText(todo.task);
     };
 
     // Handle updating a task
     const handleUpdate = (id) => {
-        if (editedText.trim() === "") return; // Don't update if the input is empty
+        if (editedText.trim() === "") return;
 
-        axios.put(`http://localhost:3001/update/${id}`, { task: editedText })
+        axios.put(`http://localhost:3001/edit/${id}`, { task: editedText })
             .then(result => {
-                // Update the task in the todos state
                 const updatedTodos = todos.map(todo =>
                     todo._id === id ? { ...todo, task: editedText } : todo
                 );
                 setTodos(updatedTodos);
-                setEditTask(null); // Clear the editing state
-                setEditedText(''); // Clear the edited text input
+                setEditTask(null);
+                setEditedText('');
             })
             .catch(err => console.log(err));
     };
@@ -65,15 +76,27 @@ function Home() {
     return (
         <div className="home">
             <h2 className="home-title">To Do List</h2>
-            <Create fetchTodos={fetchTodos} /> {/* Pass fetchTodos function to Create */}
+            <Create fetchTodos={fetchTodos} />
+            
+            {/* Search bar */}
+            <div className="search-bar-container">
+                <input
+                    type="text"
+                    placeholder="Search tasks..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="search-input"
+                />
+            </div>
+
             <div className="todo-list">
                 {
-                    todos.length === 0 ? (
+                    filteredTodos.length === 0 ? (
                         <div className="no-records">
                             <h2>No Records</h2>
                         </div>
                     ) : (
-                        todos.map((todo, index) => (
+                        filteredTodos.map((todo, index) => (
                             <div className="todo-item" key={index}>
                                 <div className="task">
                                     <div className="checkbox" onClick={() => handleToggleDone(todo._id, todo.done)}>
@@ -97,7 +120,7 @@ function Home() {
                                     ) : (
                                         <div className="button-container">
                                             <button className="update-btn" onClick={() => handleEditClick(todo)}>
-                                                <BsPencil className="icon" /> {/* Pencil icon for editing */}
+                                                <BsPencil className="icon" />
                                             </button>
                                             <button className="delete-btn" onClick={() => handleDelete(todo._id)}>
                                                 <BsFillTrashFill className="icon" />

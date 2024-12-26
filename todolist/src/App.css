@@ -246,3 +246,22 @@
   background-color: #f9fafb; /* Slight hover effect */
   transform: scale(1.02); /* Zoom effect on hover */
 }
+
+.search-bar-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+}
+
+.search-input {
+  width: 350px; /* Adjust width according to your requirement */
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: #007BFF;
+}
