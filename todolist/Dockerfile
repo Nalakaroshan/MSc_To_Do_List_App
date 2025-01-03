@@ -7,11 +7,8 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
-
-# Install Vite
-RUN npm install --save-dev vite
+# Install dependencies including vite globally
+RUN npm install -g vite && npm install
 
 # Copy the rest of the application code
 COPY . .
