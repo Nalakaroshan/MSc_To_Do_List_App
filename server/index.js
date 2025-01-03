@@ -4,70 +4,103 @@ const cors = require('cors');
 const TodoModel = require('./Models/Todo');
 
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect('mongodb+srv://apps:apps@msc.benfy.mongodb.net/?retryWrites=true&w=majority&appName=MSc');
-
-// Connection success
-mongoose.connection.once('open', () => {
-    console.log('Connected to the database successfully!');
+// Connect to MongoDB using environment variable
+const mongoURI = process.env.MONGO_URL || 'mongodb+srv://apps:apps@msc.benfy.mongodb.net/?retryWrites=true&w=majority&appName=MSc'; // Fallback for local development
+mongoose.connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 });
 
-// Connection error
+//mongodb+srv://apps:<db_password>@msc.benfy.mongodb.net/?retryWrites=true&w=majority&appName=MSc
+// Connection event listeners
+mongoose.connection.on('connected', () => {
+    console.log('MongoDB connected successfully.');
+});
 mongoose.connection.on('error', (err) => {
-    console.error('Failed to connect to the database:', err);
+    console.error(`MongoDB connection error: ${err}`);
+});
+mongoose.connection.on('disconnected', () => {
+    console.warn('MongoDB disconnected.');
 });
 
-// Disconnection event
-mongoose.connection.on('disconnected', () => {
-    console.warn('Database connection lost.');
-});
+// REST API Endpoints
 
 // Get all tasks
-app.get('/get', (req, res) => {
-    TodoModel.find()
-        .then(result => res.json(result))
-        .catch(err => res.json(err));
+app.get('/get', async (req, res) => {
+    try {
+        const tasks = await TodoModel.find();
+        res.json(tasks);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // Update task status
-app.put('/update/:id', (req, res) => {
+app.put('/update/:id', async (req, res) => {
     const { id } = req.params;
-    const { done } = req.body; // Getting the updated 'done' status from the request body
+    const { done } = req.body;
 
-    TodoModel.findByIdAndUpdate({ _id: id }, { done }, { new: true })
-        .then(result => res.json(result)) // Return the updated task to frontend
-        .catch(err => res.json(err));
+    try {
+        const updatedTask = await TodoModel.findByIdAndUpdate(
+            id,
+            { done },
+            { new: true }
+        );
+        res.json(updatedTask);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // Edit the task
-app.put('/edit/:id', (req, res) => {
+app.put('/edit/:id', async (req, res) => {
     const { id } = req.params;
-    const { task, done } = req.body; // Get task and done status from the request body
+    const { task, done } = req.body;
 
-    TodoModel.findByIdAndUpdate({ _id: id }, { task, done }, { new: true })
-        .then(result => res.json(result)) // Return the updated task
-        .catch(err => res.json(err));
+    try {
+        const updatedTask = await TodoModel.findByIdAndUpdate(
+            id,
+            { task, done },
+            { new: true }
+        );
+        res.json(updatedTask);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // Add new task
-app.post("/add", (req, res) => {
-    const task = req.body.task;
-    TodoModel.create({
-        task: task
-    }).then(result => res.json(result))
-        .catch(err => res.json(err));
+app.post('/add', async (req, res) => {
+    const { task } = req.body;
+
+    try {
+        const newTask = await TodoModel.create({ task });
+        res.json(newTask);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // Delete task
-app.delete("/delete/:id", (req, res) => {
+app.delete('/delete/:id', async (req, res) => {
     const { id } = req.params;
-    TodoModel.findByIdAndDelete(id)
-        .then(() => res.json({ message: "Task deleted successfully" }))
-        .catch(err => res.json(err));
+
+    try {
+        await TodoModel.findByIdAndDelete(id);
+        res.json({ message: 'Task deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
-app.listen(3001, () => {
-    console.log("Server is Running");
+
+// Start the server
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
