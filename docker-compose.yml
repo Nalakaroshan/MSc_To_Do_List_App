@@ -5,6 +5,7 @@ services:
     build:
       context: ./todolist
       dockerfile: Dockerfile
+    image: nalakaroshan/msc_ncc:server
     ports:
       - "8080:80"
     depends_on:
@@ -14,6 +15,7 @@ services:
     build:
       context: ./server
       dockerfile: dockerfile
+    image: nalakaroshan/msc_ncc:todolist
     ports:
       - "3001:3001"
     environment:
